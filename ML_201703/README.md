@@ -1,7 +1,7 @@
 # MACHINE LEARNING ENGINEER / DATA SCIENTIST 
 ## ML Challenge
 
-Here is a small example dataset (sample.csv - 40 MB unziped, 2 MB zipped) containing 66k records/rows and 295 features/columns. 
+Here is a small example dataset (CSV sample.zip - 40 MB unziped, 2 MB zipped) containing 66k records/rows and 295 features/columns. 
 The target variable is the last columns (the 296th) with values/classes A,B,C,D,E.
 Obviously we challenge you to analyze the data and to build some initial ML model which predicts the classes.
 

@@ -2,7 +2,7 @@
 ## ML Challenge
 
 Here is a small example data set (CSV sample.zip - 40 MB unzipped, 2 MB zipped) containing 66k records/rows and 295 features/columns.
-The target variable is the last columns (the 296th) with values/classes A,B,C,D,E.
+The target variable is the last column (the 296th) with values/classes A,B,C,D,E.
 Obviously we challenge you to analyze the data and to build some initial ML model which predicts the classes.
 
 ## Steps:

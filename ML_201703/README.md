@@ -1,14 +1,14 @@
-# MACHINE LEARNING ENGINEER / DATA SCIENTIST 
+# MACHINE LEARNING ENGINEER / DATA SCIENTIST
 ## ML Challenge
 
-Here is a small example dataset (CSV sample.zip - 40 MB unziped, 2 MB zipped) containing 66k records/rows and 295 features/columns. 
+Here is a small example data set (CSV sample.zip - 40 MB unzipped, 2 MB zipped) containing 66k records/rows and 295 features/columns.
 The target variable is the last columns (the 296th) with values/classes A,B,C,D,E.
 Obviously we challenge you to analyze the data and to build some initial ML model which predicts the classes.
 
 ## Steps:
 
 ### 1. Make some initial data analysis.
-Try to find some stuctures in the data and how attributes are possibly connected.
+Try to find some structures in the data and how attributes are possibly connected.
 
 ### 2. Fit some ML model(s).
 Under the models should definitely be some Neural Network and please explain briefly your choices.
@@ -26,10 +26,10 @@ If possible add also some critical thinking and next possible steps.
 
 ## Please use only Python for your solution!
 
-### We don't expect you to build THE solution here. 
+### We don't expect you to build THE solution here.
 Our goal here is:
 * see how you approach such a problem
-* get an idea of your programming skills and ML knowlegde
+* get an idea of your programming skills and ML knowledge
 * see how you can summarize and present results
 
 

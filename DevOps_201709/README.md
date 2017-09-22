@@ -80,6 +80,12 @@ and however you want and which will take care of the following:
 - it pauses the execution of `step2.py` indefinitely if it failed once
   and notifies administrator by sending email to "etl-admin@example.com".
 
+Deliverables: 
+---
+
+* two scripts (well commented and easy to follow)
+* a document explaining what they do and how to set them up
+
 
 Testing your solution 
 ---

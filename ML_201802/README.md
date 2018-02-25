@@ -11,17 +11,20 @@ Obviously we challenge you to analyze the data and to build some initial ML mode
 Try to find some structures in the data and how attributes are possibly connected.
 
 ### 2. Fit some ML model(s).
-Under the models should definitely be some Neural Network and please explain briefly your choices.
+Under the models should definitely be some Neural Network and please explain briefly your choices for the models and their pros & cons.
 
 ### 3. Show with some X-validation the power of your model and comment the results.
+We are of course interested in the overall performance, but much more in the performance per class, especially the under represented ones.
 
 ### 4. Present us the results and the steps you have taken.
 If possible add also some critical thinking and next possible steps.
 
 
-## Deliverables:
-* Code: well commented and easy to follow code
-* PDF (max 3 pages) with brief steps taken and results (incl. intermediates)
+## Deliverable & Remarks:
+* well commented and easy to follow code
+* send us straight .py python files (no ipython notebooks)
+* work with classes and functions, show a bit of your programming skills
+* PDF (max 3 pages) with brief steps taken and results
 
 
 ## Please use only Python for your solution!
@@ -31,5 +34,6 @@ Our goal here is:
 * see how you approach such a problem
 * get an idea of your programming skills and ML knowledge
 * see how you can summarize and present results
+
 
 

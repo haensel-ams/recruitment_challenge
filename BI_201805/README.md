@@ -20,32 +20,34 @@ before he or she buys something (a conversion or transaction).
 * Channel - marketing channel
 * IHC_Conv - attributed conversion fraction by the IHC model
 
-Note IHC_Conv sums up to 1.0 for every conversion, i.e. it is the fraction of the 
-conversion which is attributed to a certain channel.
+Note, that the attributed conversion fraction (IHC_Conv), i.e. it is the fraction of the 
+given conversion which is attributed to a certain channel, sums up to 1.0 for every conversion.
+
+You can find data from these tables also in MySQL database called 'hams_challenge' at server with IP '54.93.190.144' (login as user 'applicant' with password 'hams').
 
 ## Task
 
-Obviously, we want you to analyze the data. ;-)
+Obviously, we want you to analyze the data and show us what you can learn from it. ;-)
 
 But we also want you to visualize your findings try to get "useful" insights out of it and present them in a nice
 PDF.
 
 ### some hints, (non-exhaustive) list of points you might consider in your analysis:
 
-* general overview over the time period
-* customer journey statistics
-* interesting KPIs are: revenue, number customers, fraction of return customer
+* general overview over the time period (interesting KPIs are: revenue, number customers, fraction of return customer)
+* performance and impact of different channels and how it changes over time
+* most influential channels for every user
 * cohort analysis
-* performance and impact of different channels
-* do we see a development within customers
+* customer journey statistics
+* do we see a development within customers?
 * some customer segmentation
 * ...
 
 
 ### Deliverable & Remarks:
-* well commented and easy to follow code
+* well commented and easy to follow code for analysis
 * if possible some insightful (!) charts with explanations (use of powerBI or Tableau would be great to see)
-* PDF (max 3-4 pages!) with brief explanation steps taken and results
+* PDF (max 3-4 pages!) with brief explanation of steps taken and the summary of results
 
 
 

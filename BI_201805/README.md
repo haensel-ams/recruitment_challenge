@@ -23,7 +23,6 @@ before he or she buys something (a conversion or transaction).
 Note, that the attributed conversion fraction (IHC_Conv), i.e. it is the fraction of the 
 given conversion which is attributed to a certain channel, sums up to 1.0 for every conversion.
 
-You can find data from these tables also in MySQL database called 'hams_challenge' at server with IP '54.93.190.144' (login as user 'applicant' with password 'hams').
 
 ## Task
 

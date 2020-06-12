@@ -3,23 +3,25 @@ With this challenge we want to test your ability to calculate interesting KPIs, 
 and to derive usable insights from them.
 
 ## Task
-Obviously, we want you to analyze the data in the csv file. ;-)
+Obviously, we want you to analyze the data in the file **testdata.csv** file. ;-)
 
 But we also want you to visualize your findings and calculations in order to get "useful" insights 
 out of it.
 
-Here are some KPIs which might be interesting:
+Here are **only** some KPIs which might be interesting:
 - CPC
 - ROI
 - CPA 
 - CPRO: cost per re-order
 - CVR: conversion rate
+- ...
 
 Note: The data is provided on **event dates**, when the session happend, 
 so you only see a parts of the customer journeys which is happend in the selected period.
 
+Also have a look at the attached IHC case study PDFs.
 
-## Columns in the CSV file
+## Columns in the CSV file testdata.csv
 
 - Event_Date: date when the session happend	
 - Channel: name of the traffic channel	

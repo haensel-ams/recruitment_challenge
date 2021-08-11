@@ -31,20 +31,20 @@ The campaign_id here links to the campaign_id in the 'session_sources' table.
 * conversions:
     * *conv_id*: unique identifier of this conversion
     * *user_id*: user identifier
-    * *conv_date *: date when the conversion happened
+    * *conv_date*: date when the conversion happened
     * *market*: regional market that this conversion belongs to
     * *revenue*: conversion amount (i.e. how much revenue the company earned through this conversion, you can assume its in Euro)
 
 * conversions_backend :
     * *conv_id*: unique identifier of this conversion
     * *user_id*: user identifier
-    * *conv_date *: date when the conversion happened
+    * *conv_date*: date when the conversion happened
     * *market*: regional market that this conversion belongs to
     * *revenue*: conversion amount
 
 * api_adwords_costs :
     * *event_date*: date when the AdWords campaign was running 
-    * *campaign_id *: campaign identifier
+    * *campaign_id*: campaign identifier
     * *cost*: amount that was spent on running this campaign on this day (assume its in Euro)
     * *clicks*: number of times a user clicked on this ad on the given day
 

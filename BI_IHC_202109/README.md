@@ -19,7 +19,7 @@ You need to use the API: <br>
 
 ## Task
 
-* Make a test account API
+* Make a test account for the API
 * Use the customer journey dataset **customer_journeys_sample.json** as source for your training and test sets
 * Train a new conversion type
 * Create a jupyter notebook where you use the webservice for test evaluation
@@ -29,7 +29,7 @@ You need to use the API: <br>
 
 ## Deliverable
 
-- a Jupyter Notebook that answers the questions above
+- a Jupyter Notebook that performs the tasks above
 - please explain your approaches and state any assumptions that you make and that are not mentioned in the challenge
 - if you use charts/pivots to answer the questions, please include them as well in your report
 - keep your results concise, no need to mention findings unrelated to the questions above

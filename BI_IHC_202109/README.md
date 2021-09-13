@@ -8,11 +8,11 @@ and your ability to analyze customer journey data.
 This challenge is set in the e-commerce area, more specifically the field of attribution.
 
 More background can be found here: <br>
-[https://ihc-attribution.com/ ](https://ihc-attribution.com/ ){:target="_blank"} <br>
-[lhttps://ihc-attribution.com/ihc-attribution-model/](uhttps://ihc-attribution.com/ihc-attribution-model/){:target="_blank"}<br>
+[ihc-attribution.com] (https://ihc-attribution.com/ ) {target="_blank" rel="noopener"} <br>
+[ihc-attribution.com/ihc-attribution-model/] (https://ihc-attribution.com/ihc-attribution-model/) { target="_blank" rel="noopener"}<br>
 
 You need to use the API: <br>
-[https://ihc-attribution.com/api-attribution/](https://ihc-attribution.com/api-attribution/){:target="_blank"}
+[ihc-attribution.com/api-attribution/] (https://ihc-attribution.com/api-attribution/) { target="_blank" rel="noopener"}
 
 
 ## Task

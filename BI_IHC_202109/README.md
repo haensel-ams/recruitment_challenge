@@ -15,6 +15,8 @@ More background can be found here: <br>
 You need to use the API: <br>
 <a href="ttps://ihc-attribution.com/api-attribution/" target="_blank">https://ihc-attribution.com/api-attribution/</a> <br>
 
+Instructions for the Registration can be found here: <br>
+<a href="https://docs.google.com/document/d/1N4roYPuvTqhvSZP5LVTBhtM4k7E1oe6llnNmBV-jQsI/" target="_blank">Getting Started Guid</a> <br>
 
 
 ## Task

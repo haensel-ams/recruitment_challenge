@@ -1,4 +1,4 @@
-# DevOps/ Data Engineer Challenge
+# Python Google API Challenge
 
 Our challenge is set in the context working with major platform APIs.
 We want you to setup the API for Gmail and do some easy tasks with it.

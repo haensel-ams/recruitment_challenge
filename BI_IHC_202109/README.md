@@ -1,6 +1,6 @@
-# Business Intelligence / Operations Research Challenge
+# Operations Research Challenge
 
-Welcome to the HAMS BI/OR Challenge! 
+Welcome to the HAMS OR Challenge! 
 With this challenge we want to test your python skills in terms of using out attribution API,
 and your ability to analyze customer journey data.
 

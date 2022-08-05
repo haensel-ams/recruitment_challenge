@@ -9,11 +9,11 @@ This challenge is set in the e-commerce area, more specifically the field of att
 
 More background can be found here: <br>
 <a href="https://ihc-attribution.com/" target="_blank">https://ihc-attribution.com/</a> <br>
-<a href="https://ihc-attribution.com/ihc-attribution-model/" target="_blank">https://ihc-attribution.com/ihc-attribution-model/</a>
+<a href="https://ihc-attribution.com/ihc-data-driven-attribution-model/" target="_blank">https://ihc-attribution.com/ihc-data-driven-attribution-model/</a>
 
 
 You need to use the API: <br>
-<a href="ttps://ihc-attribution.com/api-attribution/" target="_blank">https://ihc-attribution.com/api-attribution/</a> <br>
+<a href="https://ihc-attribution.com/marketing-attribution-api/" target="_blank">https://ihc-attribution.com/marketing-attribution-api/</a> <br>
 
 Instructions for the Registration can be found here: <br>
 <a href="https://docs.google.com/document/d/1N4roYPuvTqhvSZP5LVTBhtM4k7E1oe6llnNmBV-jQsI/" target="_blank">Getting Started Guid</a> <br>

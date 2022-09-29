@@ -1,6 +1,6 @@
-# Data Quality Engineer Challenge
+# Data Quality Challenge
 
-Welcome to the HAMS Data Quality Engineer Challenge! With this challenge we want to test your ability to analyze the data in the accompanying database and find potential data quality issues.
+Welcome to the HAMS Data Quality Challenge! With this challenge we want to test your ability to analyze the data in the accompanying database and find potential data quality issues.
 
 
 ## Task

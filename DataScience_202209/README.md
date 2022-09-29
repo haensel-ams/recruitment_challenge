@@ -39,10 +39,8 @@ This is of course the perfect setting for an ambitious Data Scientist. ;-) Model
 
 ## Deliverable
 
-- the Jupyter notebook
-- a brief PDF report that answers the questions above
-- please explain your approach for each question and state any assumptions that you make and that are not mentioned in the challenge
-- if you use charts/pivots to answer the questions, please include them as well in your report
+- the Jupyter notebook which runs the model and generates the results
+- (nice to have) a brief PDF report that answers the questions above
 - keep your results concise (maximum 3-4 pages)
 
 

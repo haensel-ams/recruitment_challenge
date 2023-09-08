@@ -59,7 +59,7 @@ You can imagine that this pipeline should run in separate steps/tasks via an orc
 2. Write Python code to query and build customer journeys out of the two tables: *session_sources* and *conversions*
     - for each *conv_id* you need to get all sessions for the given *user_id* that happened before the conversion timestamp
 3. Transform customer journey into list(s) of dictionaries and send to IHC API (https://ihc-attribution.com/marketing-attribution-api/)
-    - you can use the following API Key: 'ae3e7602-f3e9-47c0-8917-796940dbc28f' and the following conv_type_id = 'data_engineering_challenge'
+    - you can use the following API Key: '{shared_via_email}' and the following conv_type_id = 'data_engineering_challenge'
     - you need to send the data in chunks as the API is limited to the amount of data that can be processed at once (see 'LIMITS AND QUOTAS' here https://ihc-attribution.com/marketing-attribution-api/)
 4. Write the data received back from the IHC API to the table *attribution_customer_journey*
 5. Fill the table *channel_reporting* by querying the now filled four tables: *session_sources*, *session_costs*, *conversions* and *attribution_customer_journey*

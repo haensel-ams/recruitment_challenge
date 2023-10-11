@@ -40,7 +40,7 @@ You can imagine that this pipeline should run in separate steps/tasks via an orc
     * *session_id*: unique identifier of this session
     * *ihc*: attribution value of this session_id for this conv_id (in range of 0-1, you get this back from the IHC API)
 
-*Note 1: this table is empty and needs to be filled after data has been received from the IHC API*
+*Note 1: this table does not exist by default and needs to be created using the challenge_db_create.sql file and subsequently filled after data has been received from the IHC API*
 
 *Note 2: the sum of 'ihc' column in the 'attribution_customer_journey' should be equal to 1 (100%) for each 'conv_id'*
 
@@ -52,7 +52,7 @@ You can imagine that this pipeline should run in separate steps/tasks via an orc
     * *ihc*: sum of *ihc* for the sessions on the given date and channel
     * *ihc_revenue*: sum of (*ihc* x *revenue* (from conversions table)) for the sessions on the given date and channel
 
-*Note 3: this table is empty and needs to be filled after data has been received from the IHC API and has been combined*
+*Note 3: this table does not exist by default and needs to be created using the challenge_db_create.sql file and subsequently filled after data has been received from the IHC API and has been combined*
 
 ## Steps
 1. Familiarize yourself with the IHC attribution model (https://ihc-attribution.com/ihc-data-driven-attribution-model/)

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" class="h-100">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Sticky Footer Navbar Template · Bootstrap</title>
+    <!-- Bootstrap core CSS -->
+    <link
+      href="./node_modules/bootstrap/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+    <!-- Custom styles for this template -->
+    <link href="sticky-footer-navbar.css" rel="stylesheet" />
+  </head>
+  <body class="d-flex flex-column h-100">
+    <header>
+      <!-- Fixed navbar -->
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="#">Fixed navbar</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarCollapse"
+          aria-controls="navbarCollapse"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="#"
+                >Home <span class="sr-only">(current)</span></a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Link</a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link disabled"
+                href="#"
+                tabindex="-1"
+                aria-disabled="true"
+                >Disabled</a
+              >
+            </li>
+          </ul>
+          <form class="form-inline mt-2 mt-md-0">
+            <input
+              class="form-control mr-sm-2"
+              type="text"
+              placeholder="Search"
+              aria-label="Search"
+            />
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+              Search
+            </button>
+          </form>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Begin page content -->
+    <main role="main" class="flex-shrink-0">
+      <div id="mainContainer" class="container">
+        <h1 class="mt-5 md-2">D3 challenge</h1>
+        <div class="row">
+          <div id="histo"></div>
+        </div>
+        <div class="row d-flex justify-content-center">
+          <span class="d-flex align-items-center mr-2"
+            >Lorem ipsum dolorem</span
+          >
+          <button class="btn btn-primary">Primary</button>
+        </div>
+      </div>
+    </main>
+
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      window.jQuery ||
+        document.write(
+          '<script src="../assets/js/vendor/jquery.slim.min.js"><\/script>'
+        );
+    </script>
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="https://d3js.org/d3.v4.js"></script>
+    <script>
+      function drawGraph() {
+        d3.selectAll("svg").remove();
+        var margin = { top: 10, right: 40, bottom: 30, left: 40 },
+          width = document.getElementById("mainContainer").clientWidth,
+          height = width / 3.236;
+
+        // append the svg object to the body of the page
+        var svg = d3
+          .select("#histo")
+          .append("svg")
+          .attr("width", width + margin.left + margin.right)
+          .attr("height", height + margin.top + margin.bottom)
+          .classed("col-auto", true)
+          .append("g")
+          .attr(
+            "transform",
+            "translate(" + margin.left + "," + margin.top + ")"
+          );
+
+        d3.csv(
+          "https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/1_OneNum.csv",
+          function (data) {
+            var x = d3
+              .scaleLinear()
+              .domain([0, 1000])
+              .range([0, width - 100]);
+
+            svg
+              .append("g")
+              .attr("transform", "translate(0," + height + ")")
+              .call(d3.axisBottom(x));
+
+            var histogram = d3
+              .histogram()
+              .value(function (d) {
+                return d.price;
+              })
+              .domain(x.domain())
+              .thresholds(x.ticks(70));
+
+            var bins = histogram(data);
+
+            var y = d3.scaleLinear().range([height, 0]);
+            y.domain([
+              0,
+              d3.max(bins, function (d) {
+                return d.length;
+              }),
+            ]);
+            svg.append("g").call(d3.axisLeft(y));
+
+            svg
+              .selectAll("rect")
+              .data(bins)
+              .enter()
+              .append("rect")
+              .attr("x", 1)
+              .attr("transform", function (d) {
+                return "translate(" + x(d.x0) + "," + y(d.length) + ")";
+              })
+              .attr("width", function (d) {
+                return x(d.x1) - x(d.x0) - 1;
+              })
+              .attr("height", function (d) {
+                return height - y(d.length);
+              })
+              .style("fill", "#69b3a2");
+          }
+        );
+      }
+
+      drawGraph();
+
+      function render() {
+        d3.selectAll("svg").remove();
+        drawGraph();
+      }
+
+      window.onresize = render;
+    </script>
+  </body>
+</html>

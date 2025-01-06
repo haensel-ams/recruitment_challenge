@@ -56,14 +56,14 @@ You can imagine that this pipeline should run in separate steps/tasks via an orc
 
 ## Steps
 1. Familiarize yourself with the IHC attribution model (https://ihc-attribution.com/ihc-data-driven-attribution-model/)
-2. Write Python code to query and build customer journeys out of the two tables: *session_sources* and *conversions*
+    - Create a free IHC test account (be aware of the API limits for test accounts)
+3. Write Python code to query and build customer journeys out of the two tables: *session_sources* and *conversions*
     - for each *conv_id* you need to get all sessions for the given *user_id* that happened before the conversion timestamp
-3. Transform customer journey into list(s) of dictionaries and send to IHC API (https://ihc-attribution.com/marketing-attribution-api/)
-    - you can use the following API Key: '{shared_via_email}' and the following conv_type_id = 'data_engineering_challenge'
+4. Transform customer journey into list(s) of dictionaries and send to IHC API (https://ihc-attribution.com/marketing-attribution-api/)
     - you need to send the data in chunks as the API is limited to the amount of data that can be processed at once (see 'LIMITS AND QUOTAS' here https://ihc-attribution.com/marketing-attribution-api/)
-4. Write the data received back from the IHC API to the table *attribution_customer_journey*
-5. Fill the table *channel_reporting* by querying the now filled four tables: *session_sources*, *session_costs*, *conversions* and *attribution_customer_journey*
-6. Create a .csv file of *channel_reporting* and add the following two columns:
+5. Write the data received back from the IHC API to the table *attribution_customer_journey*
+6. Fill the table *channel_reporting* by querying the now filled four tables: *session_sources*, *session_costs*, *conversions* and *attribution_customer_journey*
+7. Create a .csv file of *channel_reporting* and add the following two columns:
     * *CPO*: (cost per order) showing the amount of marketing costs for the given date and channel that was spent on getting one attributed (IHC) order
     * *ROAS*: (return on ad spend) showing revenue earned for each Euro you spend on marketing
 

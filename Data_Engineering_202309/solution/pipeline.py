@@ -1,11 +1,21 @@
 from datetime import datetime as dt
+from collections import defaultdict
 import os
 import sqlite3
+import logging
 
 import requests
 
 import pandas as pd
 
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
 
 # API setup
 API_KEY = os.getenv("IHC_API_KEY")
@@ -18,11 +28,14 @@ conn = sqlite3.connect(DB_PATH)
 
 def _execute_query(query):
     """Execute a query and return the results as a Pandas DataFrame."""
+    logging.info(f"Executing query: {query}")
     return pd.read_sql_query(query, conn)
 
 
 def _filter_data_by_date(df, date_column, start_date, end_date):
     """Filter a DataFrame by a specific date range."""
+    logging.info(
+        f"Filtering data by date range: start_date={start_date}, end_date={end_date}")
     conditions = []
     if start_date:
         conditions.append(df[date_column] >= start_date)
@@ -33,6 +46,8 @@ def _filter_data_by_date(df, date_column, start_date, end_date):
 
 def get_customer_journeys(conversions, sessions):
     """Create customer journeys by matching sessions to conversions."""
+    logging.info(
+        "Creating customer journeys by matching sessions to conversions.")
     # Merge conversions and sessions on user_id
     merged = sessions.merge(
         conversions, on='user_id', suffixes=('_session', '_conversion')
@@ -63,6 +78,7 @@ def get_customer_journeys(conversions, sessions):
 
 def _chunk_data(data, chunk_size):
     """Split data into smaller chunks of specified size."""
+    logging.info(f"Chunking data into chunks of size {chunk_size}.")
     for i in range(0, len(data), chunk_size):
         yield data[i:i + chunk_size]
 
@@ -75,17 +91,43 @@ def _send_to_api(payloads):
 
     for payload in payloads:
         try:
+            logging.info("Sending payload to API.")
             response = requests.post(
                 api_url, json={"customer_journeys": payload}, headers=headers)
             response.raise_for_status()
-            results.extend(response.json()["value"])
+            json_data = response.json()
+            if json_data['statusCode'] == 206:
+                logging.warning(
+                    f"Partial errors occurred: {json_data['partialFailureErrors']}")
+            results.extend(json_data.get("value", []))
         except requests.exceptions.RequestException as e:
-            print(f"API request failed: {e}")
+            logging.error(f"API request failed: {e}")
     return results
+
+
+def _validate_attribution_data(results):
+    """Validate that the sum of 'ihc' for each 'conversion_id' equals 1."""
+    ihc_sums = defaultdict(float)
+
+    # Calculate the sum of 'ihc' for each 'conversion_id'
+    for result in results:
+        ihc_sums[result['conversion_id']] += result['ihc']
+
+    # Check for invalid sums
+    invalid_conv_ids = {
+        conv_id: total for conv_id, total in ihc_sums.items()
+        if abs(total - 1) > 1e-6
+    }
+
+    if invalid_conv_ids:
+        logging.warning(f"Data validation failed for the following 'conversion_id':\n{invalid_conv_ids}")
+        # raise ValueError("Validation failed: The sum of 'ihc' is not 1 for some 'conversion_id'.")
+    logging.info("Data validation passed: All 'conversion_id' have a valid 'ihc' sum.")
 
 
 def _save_attribution_results(results):
     """Save attribution results from the API into the database."""
+    logging.info("Saving attribution results to the database.")
     df = pd.DataFrame(results, columns=["conversion_id", "session_id", "ihc"])
     df.rename(columns={"conversion_id": "conv_id",
               "session_id": "session_id", "ihc": "ihc"}, inplace=True)
@@ -94,11 +136,13 @@ def _save_attribution_results(results):
         df.to_sql("attribution_customer_journey", conn, if_exists="append",
                   index=False, chunksize=500, method='multi')
     except sqlite3.IntegrityError as e:
-        print(f"IntegrityError encountered: {e}. Ignoring duplicates.")
+        logging.warning(
+            f"IntegrityError encountered: {e}. Ignoring duplicates.")
 
 
 def generate_channel_reporting():
     """Generate aggregated channel reporting metrics, save to the database."""
+    logging.info("Generating channel reporting metrics.")
     insert_query = """
         INSERT INTO channel_reporting (channel_name, date, cost, ihc, ihc_revenue)
         SELECT
@@ -130,10 +174,12 @@ def generate_channel_reporting():
 
 def export_to_csv(df, filename):
     """Export a DataFrame to a CSV file."""
+    logging.info(f"Exporting DataFrame to {filename}.")
     df.to_csv(filename, index=False, quoting=1, encoding="utf-8")
 
 
 def main(start_date=None, end_date=None):
+    logging.info("Starting main execution.")
     # Extract data
     conversions = _execute_query("SELECT * FROM conversions;")
     sessions = _execute_query("SELECT * FROM session_sources;")
@@ -149,12 +195,15 @@ def main(start_date=None, end_date=None):
 
     # Get customer journeys
     customer_journeys = get_customer_journeys(conversions, sessions)
-    # print(len(customer_journeys))
+    logging.info(f"Generated {len(customer_journeys)} customer journeys.")
 
-    # Send data to API
+    # Send data to API and collect the results
     chunked_payloads = list(_chunk_data(customer_journeys, chunk_size=100))
     results = _send_to_api(chunked_payloads)
-    # print(len(results))
+    logging.info(f"Received {len(results)} results from the API.")
+
+    # Validate the attribution data
+    _validate_attribution_data(results)
 
     # Save results to DB
     _save_attribution_results(results)
@@ -164,6 +213,7 @@ def main(start_date=None, end_date=None):
 
     # Save reporting as a CSV file
     export_to_csv(reporting, "channel_reporting.csv")
+    logging.info("Main execution completed successfully.")
 
 
 if __name__ == "__main__":

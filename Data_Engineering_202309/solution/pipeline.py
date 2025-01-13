@@ -16,12 +16,12 @@ DB_PATH = os.getenv("DB_PATH", "../challenge.db")
 conn = sqlite3.connect(DB_PATH)
 
 
-def execute_query(query):
+def _execute_query(query):
     """Execute a query and return the results as a Pandas DataFrame."""
     return pd.read_sql_query(query, conn)
 
 
-def filter_data_by_date(df, date_column, start_date, end_date):
+def _filter_data_by_date(df, date_column, start_date, end_date):
     """Filter a DataFrame by a specific date range."""
     conditions = []
     if start_date:
@@ -61,13 +61,13 @@ def get_customer_journeys(conversions, sessions):
     }).to_dict(orient='records')
 
 
-def chunk_data(data, chunk_size):
+def _chunk_data(data, chunk_size):
     """Split data into smaller chunks of specified size."""
     for i in range(0, len(data), chunk_size):
         yield data[i:i + chunk_size]
 
 
-def send_to_api(payloads):
+def _send_to_api(payloads):
     """Send customer journeys to the IHC API and retrieve attribution results."""
     api_url = f"https://api.ihc-attribution.com/v1/compute_ihc?conv_type_id={API_CONV_ID}"
     headers = {"Content-Type": "application/json", "x-api-key": API_KEY}
@@ -84,7 +84,7 @@ def send_to_api(payloads):
     return results
 
 
-def save_attribution_results(results):
+def _save_attribution_results(results):
     """Save attribution results from the API into the database."""
     df = pd.DataFrame(results, columns=["conversion_id", "session_id", "ihc"])
     df.rename(columns={"conversion_id": "conv_id",
@@ -120,7 +120,7 @@ def generate_channel_reporting():
     conn.commit()
 
     # Add CPO and ROAS columns, handling division by zero
-    reporting = execute_query("SELECT * FROM channel_reporting;")
+    reporting = _execute_query("SELECT * FROM channel_reporting;")
     reporting["CPO"] = reporting["cost"] / reporting["ihc"].replace(0, pd.NA)
     reporting["ROAS"] = reporting["ihc_revenue"] / \
         reporting["cost"].replace(0, pd.NA)
@@ -135,8 +135,8 @@ def export_to_csv(df, filename):
 
 def main(start_date=None, end_date=None):
     # Extract data
-    conversions = execute_query("SELECT * FROM conversions;")
-    sessions = execute_query("SELECT * FROM session_sources;")
+    conversions = _execute_query("SELECT * FROM conversions;")
+    sessions = _execute_query("SELECT * FROM session_sources;")
     conversions['conv_timestamp'] = pd.to_datetime(
         conversions['conv_date'] + ' ' + conversions['conv_time'])
     sessions['event_timestamp'] = pd.to_datetime(
@@ -144,7 +144,7 @@ def main(start_date=None, end_date=None):
 
     # Filter data by date range
     if start_date or end_date:
-        conversions = filter_data_by_date(
+        conversions = _filter_data_by_date(
             conversions, "conv_timestamp", start_date, end_date)
 
     # Get customer journeys
@@ -152,12 +152,12 @@ def main(start_date=None, end_date=None):
     # print(len(customer_journeys))
 
     # Send data to API
-    chunked_payloads = list(chunk_data(customer_journeys, chunk_size=100))
-    results = send_to_api(chunked_payloads)
+    chunked_payloads = list(_chunk_data(customer_journeys, chunk_size=100))
+    results = _send_to_api(chunked_payloads)
     # print(len(results))
 
     # Save results to DB
-    save_attribution_results(results)
+    _save_attribution_results(results)
 
     # Generate channel reporting
     reporting = generate_channel_reporting()

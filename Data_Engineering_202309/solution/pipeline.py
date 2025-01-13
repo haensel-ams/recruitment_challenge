@@ -1,3 +1,4 @@
+from datetime import datetime as dt
 import os
 import sqlite3
 
@@ -18,6 +19,20 @@ conn = sqlite3.connect(DB_PATH)
 def execute_query(query):
     """Execute a query and return the results as a Pandas DataFrame."""
     return pd.read_sql_query(query, conn)
+
+
+def filter_data_by_date(df, date_column, start_date, end_date):
+    """Filter a DataFrame by a specific date range."""
+    if start_date and end_date:
+        date_filter = (df[date_column] >= start_date) & (
+            df[date_column] <= end_date)
+    elif start_date:
+        date_filter = df[date_column] >= start_date
+    elif end_date:
+        date_filter = df[date_column] <= end_date
+    else:
+        return df
+    return df.loc[date_filter]
 
 
 def get_customer_journeys(conversions, sessions):
@@ -116,7 +131,7 @@ def export_to_csv(df, filename):
     df.to_csv(filename, index=False, quoting=1, encoding="utf-8")
 
 
-def main():
+def main(start_date=None, end_date=None):
     # Extract data
     conversions = execute_query("SELECT * FROM conversions;")
     sessions = execute_query("SELECT * FROM session_sources;")
@@ -124,6 +139,11 @@ def main():
         conversions['conv_date'] + ' ' + conversions['conv_time'])
     sessions['event_timestamp'] = pd.to_datetime(
         sessions['event_date'] + ' ' + sessions['event_time'])
+
+    # Filter data by date range
+    if start_date or end_date:
+        conversions = filter_data_by_date(
+            conversions, "conv_timestamp", start_date, end_date)
 
     # Get customer journeys
     customer_journeys = get_customer_journeys(conversions, sessions)
@@ -145,4 +165,6 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    start_date = dt(2023, 9, 1)
+    end_date = dt(2023, 9, 30)
+    main(start_date=start_date, end_date=end_date)

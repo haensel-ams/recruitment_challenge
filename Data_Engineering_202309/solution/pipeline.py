@@ -22,6 +22,7 @@ logging.basicConfig(
 # API setup
 API_KEY = os.getenv("IHC_API_KEY")
 API_CONV_ID = os.getenv("API_CONV_ID", "coding_challenge")
+API_URL = f"https://api.ihc-attribution.com/v1/compute_ihc?conv_type_id={API_CONV_ID}"
 
 # Database setup
 DB_PATH = os.getenv("DB_PATH", "../challenge.db")
@@ -29,7 +30,15 @@ conn = sqlite3.connect(DB_PATH)
 
 
 def _execute_query(query: str) -> pd.DataFrame:
-    """Execute a query and return the results as a Pandas DataFrame."""
+    """
+    Execute a SQL query and return the results as a Pandas DataFrame.
+
+    Args:
+        query (str): The SQL query to execute.
+
+    Returns:
+        pd.DataFrame: The result of the query as a Pandas DataFrame.
+    """
     logging.info(f"Executing query: {query}")
     return pd.read_sql_query(query, conn)
 
@@ -37,7 +46,18 @@ def _execute_query(query: str) -> pd.DataFrame:
 def _filter_data_by_date(
     df: pd.DataFrame, date_column: str, start_date: Optional[dt], end_date: Optional[dt]
 ) -> pd.DataFrame:
-    """Filter a DataFrame by a specific date range."""
+    """
+    Filter a DataFrame by a specified date range.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to filter.
+        date_column (str): The column name containing date values.
+        start_date (Optional[dt]): The start date for filtering.
+        end_date (Optional[dt]): The end date for filtering.
+
+    Returns:
+        pd.DataFrame: A filtered DataFrame containing rows within the date range.
+    """
     logging.info(
         f"Filtering data by date range: start_date={start_date}, end_date={end_date}")
     conditions = []
@@ -49,7 +69,16 @@ def _filter_data_by_date(
 
 
 def get_customer_journeys(conversions: pd.DataFrame, sessions: pd.DataFrame) -> List[Dict[str, any]]:
-    """Create customer journeys by matching sessions to conversions."""
+    """
+    Create customer journeys by matching sessions to conversions.
+
+    Args:
+        conversions (pd.DataFrame): DataFrame containing conversion data.
+        sessions (pd.DataFrame): DataFrame containing session data.
+
+    Returns:
+        List[Dict[str, any]]: A list of dictionaries representing customer journeys.
+    """
     logging.info(
         "Creating customer journeys by matching sessions to conversions.")
     # Merge conversions and sessions on user_id
@@ -81,15 +110,31 @@ def get_customer_journeys(conversions: pd.DataFrame, sessions: pd.DataFrame) -> 
 
 
 def _chunk_data(data: List[Dict[str, any]], chunk_size: int) -> Generator[List[Dict[str, any]], None, None]:
-    """Split data into smaller chunks of specified size."""
+    """
+    Split data into smaller chunks of a specified size.
+
+    Args:
+        data (List[Dict[str, any]]): The data to be chunked.
+        chunk_size (int): The size of each chunk.
+
+    Yields:
+        Generator[List[Dict[str, any]], None, None]: Chunks of data.
+    """
     logging.info(f"Chunking data into chunks of size {chunk_size}.")
     for i in range(0, len(data), chunk_size):
         yield data[i:i + chunk_size]
 
 
 def _send_to_api(payloads: List[List[Dict[str, any]]]) -> List[Dict[str, any]]:
-    """Send customer journeys to the IHC API and retrieve attribution results."""
-    api_url = f"https://api.ihc-attribution.com/v1/compute_ihc?conv_type_id={API_CONV_ID}"
+    """
+    Send customer journeys to the IHC API and retrieve attribution results.
+
+    Args:
+        payloads (List[List[Dict[str, any]]]): List of payloads to send to the API.
+
+    Returns:
+        List[Dict[str, any]]: A list of results returned by the API.
+    """
     headers = {"Content-Type": "application/json", "x-api-key": API_KEY}
     results = []
 
@@ -97,7 +142,7 @@ def _send_to_api(payloads: List[List[Dict[str, any]]]) -> List[Dict[str, any]]:
         try:
             logging.info("Sending payload to API.")
             response = requests.post(
-                api_url, json={"customer_journeys": payload}, headers=headers)
+                API_URL, json={"customer_journeys": payload}, headers=headers)
             response.raise_for_status()
             json_data = response.json()
             if json_data['statusCode'] == 206:
@@ -110,7 +155,15 @@ def _send_to_api(payloads: List[List[Dict[str, any]]]) -> List[Dict[str, any]]:
 
 
 def _validate_attribution_data(results: List[Dict[str, any]]) -> None:
-    """Validate that the sum of 'ihc' for each 'conversion_id' equals 1."""
+    """
+    Validate that the sum of 'ihc' for each 'conversion_id' equals 1.
+
+    Args:
+        results (List[Dict[str, any]]): The API results to validate.
+
+    Raises:
+        ValueError: If the sum of 'ihc' for any 'conversion_id' is not 1.
+    """
     ihc_sums = defaultdict(float)
 
     # Calculate the sum of 'ihc' for each 'conversion_id'
@@ -132,7 +185,12 @@ def _validate_attribution_data(results: List[Dict[str, any]]) -> None:
 
 
 def _save_attribution_results(results: List[Dict[str, any]]) -> None:
-    """Save attribution results from the API into the database."""
+    """
+    Save attribution results from the API into the database.
+
+    Args:
+        results (List[Dict[str, any]]): The API results to save.
+    """
     logging.info("Saving attribution results to the database.")
     df = pd.DataFrame(results, columns=["conversion_id", "session_id", "ihc"])
     df.rename(columns={"conversion_id": "conv_id",
@@ -147,7 +205,12 @@ def _save_attribution_results(results: List[Dict[str, any]]) -> None:
 
 
 def generate_channel_reporting() -> pd.DataFrame:
-    """Generate aggregated channel reporting metrics, save to the database."""
+    """
+    Generate aggregated channel reporting metrics and save them to the database.
+
+    Returns:
+        pd.DataFrame: A DataFrame containing the channel reporting metrics.
+    """
     logging.info("Generating channel reporting metrics.")
     insert_query = """
         INSERT INTO channel_reporting (channel_name, date, cost, ihc, ihc_revenue)
@@ -179,12 +242,25 @@ def generate_channel_reporting() -> pd.DataFrame:
 
 
 def export_to_csv(df: pd.DataFrame, filename: str) -> None:
-    """Export a DataFrame to a CSV file."""
+    """
+    Export a DataFrame to a CSV file.
+
+    Args:
+        df (pd.DataFrame): The DataFrame to export.
+        filename (str): The name of the output CSV file.
+    """
     logging.info(f"Exporting DataFrame to {filename}.")
     df.to_csv(filename, index=False, quoting=1, encoding="utf-8")
 
 
 def main(start_date: Optional[dt] = None, end_date: Optional[dt] = None) -> None:
+    """
+    Main execution function for processing customer journeys and generating reports.
+
+    Args:
+        start_date (Optional[dt]): The start date for filtering data.
+        end_date (Optional[dt]): The end date for filtering data.
+    """
     logging.info("Starting main execution.")
     # Extract data
     conversions = _execute_query("SELECT * FROM conversions;")

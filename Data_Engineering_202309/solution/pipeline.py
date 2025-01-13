@@ -44,7 +44,11 @@ def get_customer_journeys(conversions, sessions):
         user_sessions = sessions[
             (sessions['user_id'] == conv['user_id']) &
             (sessions['event_timestamp'] < conv['conv_timestamp'])
-        ]
+        ].sort_values('event_timestamp')
+
+        # Determine the last session before the conversion
+        if not user_sessions.empty:
+            closest_session = user_sessions.iloc[-1]
 
         # Add each session to the customer_journeys list
         for _, session in user_sessions.iterrows():
@@ -55,7 +59,7 @@ def get_customer_journeys(conversions, sessions):
                 "channel_label": session['channel_name'],
                 "holder_engagement": session['holder_engagement'],
                 "closer_engagement": session['closer_engagement'],
-                "conversion": 0,  # Default to 0 for all sessions ?
+                "conversion": 1 if session['session_id'] == closest_session['session_id'] else 0,
                 "impression_interaction": session['impression_interaction']
             })
     return customer_journeys

@@ -1,12 +1,14 @@
-from datetime import datetime as dt
 from collections import defaultdict
+from datetime import datetime as dt
+import logging
 import os
 import sqlite3
-import logging
+from typing import List, Dict, Optional, Generator
 
 import requests
 
 import pandas as pd
+
 
 # Setup logging
 logging.basicConfig(
@@ -19,20 +21,22 @@ logging.basicConfig(
 
 # API setup
 API_KEY = os.getenv("IHC_API_KEY")
-API_CONV_ID = "coding_challenge"
+API_CONV_ID = os.getenv("API_CONV_ID", "coding_challenge")
 
 # Database setup
 DB_PATH = os.getenv("DB_PATH", "../challenge.db")
 conn = sqlite3.connect(DB_PATH)
 
 
-def _execute_query(query):
+def _execute_query(query: str) -> pd.DataFrame:
     """Execute a query and return the results as a Pandas DataFrame."""
     logging.info(f"Executing query: {query}")
     return pd.read_sql_query(query, conn)
 
 
-def _filter_data_by_date(df, date_column, start_date, end_date):
+def _filter_data_by_date(
+    df: pd.DataFrame, date_column: str, start_date: Optional[dt], end_date: Optional[dt]
+) -> pd.DataFrame:
     """Filter a DataFrame by a specific date range."""
     logging.info(
         f"Filtering data by date range: start_date={start_date}, end_date={end_date}")
@@ -44,7 +48,7 @@ def _filter_data_by_date(df, date_column, start_date, end_date):
     return df.loc[pd.concat(conditions, axis=1).all(axis=1)] if conditions else df
 
 
-def get_customer_journeys(conversions, sessions):
+def get_customer_journeys(conversions: pd.DataFrame, sessions: pd.DataFrame) -> List[Dict[str, any]]:
     """Create customer journeys by matching sessions to conversions."""
     logging.info(
         "Creating customer journeys by matching sessions to conversions.")
@@ -76,14 +80,14 @@ def get_customer_journeys(conversions, sessions):
     }).to_dict(orient='records')
 
 
-def _chunk_data(data, chunk_size):
+def _chunk_data(data: List[Dict[str, any]], chunk_size: int) -> Generator[List[Dict[str, any]], None, None]:
     """Split data into smaller chunks of specified size."""
     logging.info(f"Chunking data into chunks of size {chunk_size}.")
     for i in range(0, len(data), chunk_size):
         yield data[i:i + chunk_size]
 
 
-def _send_to_api(payloads):
+def _send_to_api(payloads: List[List[Dict[str, any]]]) -> List[Dict[str, any]]:
     """Send customer journeys to the IHC API and retrieve attribution results."""
     api_url = f"https://api.ihc-attribution.com/v1/compute_ihc?conv_type_id={API_CONV_ID}"
     headers = {"Content-Type": "application/json", "x-api-key": API_KEY}
@@ -105,7 +109,7 @@ def _send_to_api(payloads):
     return results
 
 
-def _validate_attribution_data(results):
+def _validate_attribution_data(results: List[Dict[str, any]]) -> None:
     """Validate that the sum of 'ihc' for each 'conversion_id' equals 1."""
     ihc_sums = defaultdict(float)
 
@@ -120,12 +124,14 @@ def _validate_attribution_data(results):
     }
 
     if invalid_conv_ids:
-        logging.warning(f"Data validation failed for the following 'conversion_id':\n{invalid_conv_ids}")
+        logging.warning(
+            f"Data validation failed for the following 'conversion_id':\n{invalid_conv_ids}")
         # raise ValueError("Validation failed: The sum of 'ihc' is not 1 for some 'conversion_id'.")
-    logging.info("Data validation passed: All 'conversion_id' have a valid 'ihc' sum.")
+    logging.info(
+        "Data validation passed: All 'conversion_id' have a valid 'ihc' sum.")
 
 
-def _save_attribution_results(results):
+def _save_attribution_results(results: List[Dict[str, any]]) -> None:
     """Save attribution results from the API into the database."""
     logging.info("Saving attribution results to the database.")
     df = pd.DataFrame(results, columns=["conversion_id", "session_id", "ihc"])
@@ -140,7 +146,7 @@ def _save_attribution_results(results):
             f"IntegrityError encountered: {e}. Ignoring duplicates.")
 
 
-def generate_channel_reporting():
+def generate_channel_reporting() -> pd.DataFrame:
     """Generate aggregated channel reporting metrics, save to the database."""
     logging.info("Generating channel reporting metrics.")
     insert_query = """
@@ -172,13 +178,13 @@ def generate_channel_reporting():
     return reporting
 
 
-def export_to_csv(df, filename):
+def export_to_csv(df: pd.DataFrame, filename: str) -> None:
     """Export a DataFrame to a CSV file."""
     logging.info(f"Exporting DataFrame to {filename}.")
     df.to_csv(filename, index=False, quoting=1, encoding="utf-8")
 
 
-def main(start_date=None, end_date=None):
+def main(start_date: Optional[dt] = None, end_date: Optional[dt] = None) -> None:
     logging.info("Starting main execution.")
     # Extract data
     conversions = _execute_query("SELECT * FROM conversions;")

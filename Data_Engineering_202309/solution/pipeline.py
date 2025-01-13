@@ -23,16 +23,12 @@ def execute_query(query):
 
 def filter_data_by_date(df, date_column, start_date, end_date):
     """Filter a DataFrame by a specific date range."""
-    if start_date and end_date:
-        date_filter = (df[date_column] >= start_date) & (
-            df[date_column] <= end_date)
-    elif start_date:
-        date_filter = df[date_column] >= start_date
-    elif end_date:
-        date_filter = df[date_column] <= end_date
-    else:
-        return df
-    return df.loc[date_filter]
+    conditions = []
+    if start_date:
+        conditions.append(df[date_column] >= start_date)
+    if end_date:
+        conditions.append(df[date_column] <= end_date)
+    return df.loc[pd.concat(conditions, axis=1).all(axis=1)] if conditions else df
 
 
 def get_customer_journeys(conversions, sessions):
@@ -52,19 +48,17 @@ def get_customer_journeys(conversions, sessions):
     filtered['is_closest_session'] = filtered.groupby('user_id')['event_timestamp'] \
         .transform('last') == filtered['event_timestamp']
 
-    # Create the customer journey dictionary
-    customer_journeys = filtered.apply(lambda row: {
-        "conversion_id": row['conv_id'],
-        "session_id": row['session_id'],
-        "timestamp": row['event_timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
-        "channel_label": row['channel_name'],
-        "holder_engagement": row['holder_engagement'],
-        "closer_engagement": row['closer_engagement'],
-        "conversion": int(row['is_closest_session']),
-        "impression_interaction": row['impression_interaction']
-    }, axis=1).tolist()
+    # Assign 1 for the closest session and 0 for others
+    filtered['conversion'] = filtered['is_closest_session'].astype(int)
 
-    return customer_journeys
+    # Return transformed data as a list of dictionaries
+    return filtered[[
+        'conv_id', 'session_id', 'event_timestamp', 'channel_name', 'holder_engagement',
+        'closer_engagement', 'conversion', 'impression_interaction'
+    ]].rename(columns={
+        'conv_id': 'conversion_id',
+        'event_timestamp': 'timestamp'
+    }).to_dict(orient='records')
 
 
 def chunk_data(data, chunk_size):
@@ -125,10 +119,12 @@ def generate_channel_reporting():
     cursor.execute(insert_query)
     conn.commit()
 
-    # Add CPO and ROAS columns
+    # Add CPO and ROAS columns, handling division by zero
     reporting = execute_query("SELECT * FROM channel_reporting;")
-    reporting["CPO"] = reporting["cost"] / reporting["ihc"]
-    reporting["ROAS"] = reporting["ihc_revenue"] / reporting["cost"]
+    reporting["CPO"] = reporting["cost"] / reporting["ihc"].replace(0, pd.NA)
+    reporting["ROAS"] = reporting["ihc_revenue"] / \
+        reporting["cost"].replace(0, pd.NA)
+    reporting = reporting.fillna(0)
     return reporting
 
 
@@ -156,7 +152,7 @@ def main(start_date=None, end_date=None):
     # print(len(customer_journeys))
 
     # Send data to API
-    chunked_payloads = list(chunk_data(customer_journeys[:100], chunk_size=100))
+    chunked_payloads = list(chunk_data(customer_journeys, chunk_size=100))
     results = send_to_api(chunked_payloads)
     # print(len(results))
 

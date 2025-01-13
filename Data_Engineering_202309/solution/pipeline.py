@@ -37,31 +37,33 @@ def filter_data_by_date(df, date_column, start_date, end_date):
 
 def get_customer_journeys(conversions, sessions):
     """Create customer journeys by matching sessions to conversions."""
-    customer_journeys = []
+    # Merge conversions and sessions on user_id
+    merged = sessions.merge(
+        conversions, on='user_id', suffixes=('_session', '_conversion')
+    )
 
-    for _, conv in conversions.iterrows():
-        # Filter sessions by user_id and timestamp before the conversion
-        user_sessions = sessions[
-            (sessions['user_id'] == conv['user_id']) &
-            (sessions['event_timestamp'] < conv['conv_timestamp'])
-        ].sort_values('event_timestamp')
+    # Filter sessions that occurred before the conversion
+    filtered = merged[merged['event_timestamp'] < merged['conv_timestamp']]
 
-        # Determine the last session before the conversion
-        if not user_sessions.empty:
-            closest_session = user_sessions.iloc[-1]
+    # Sort sessions by user_id and event_timestamp
+    filtered = filtered.sort_values(by=['user_id', 'event_timestamp'])
 
-        # Add each session to the customer_journeys list
-        for _, session in user_sessions.iterrows():
-            customer_journeys.append({
-                "conversion_id": conv['conv_id'],
-                "session_id": session['session_id'],
-                "timestamp": session['event_timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
-                "channel_label": session['channel_name'],
-                "holder_engagement": session['holder_engagement'],
-                "closer_engagement": session['closer_engagement'],
-                "conversion": 1 if session['session_id'] == closest_session['session_id'] else 0,
-                "impression_interaction": session['impression_interaction']
-            })
+    # Identify the last session before the conversion
+    filtered['is_closest_session'] = filtered.groupby('user_id')['event_timestamp'] \
+        .transform('last') == filtered['event_timestamp']
+
+    # Create the customer journey dictionary
+    customer_journeys = filtered.apply(lambda row: {
+        "conversion_id": row['conv_id'],
+        "session_id": row['session_id'],
+        "timestamp": row['event_timestamp'].strftime('%Y-%m-%d %H:%M:%S'),
+        "channel_label": row['channel_name'],
+        "holder_engagement": row['holder_engagement'],
+        "closer_engagement": row['closer_engagement'],
+        "conversion": int(row['is_closest_session']),
+        "impression_interaction": row['impression_interaction']
+    }, axis=1).tolist()
+
     return customer_journeys
 
 

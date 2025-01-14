@@ -152,20 +152,17 @@ The tool interacts with the following database tables:
      - `api.py` for API-related functions.
      - `processing.py` for data transformation.
 
-4. **Enhance Type Annotations**
-   - Add type annotations to all functions for clarity and better support for static type checking.
-
-5. **Improve SQL Performance**
+4. **Improve SQL Performance**
    - Ensure indexing on frequently queried columns like `session_id`, `conv_id`, and `event_date` to enhance performance.
 
-6. **Handle Timezone in Datetime Operations**
+5. **Handle Timezone in Datetime Operations**
    - Normalize timestamps to a consistent time zone using `pd.to_datetime(...).dt.tz_localize(...)` to avoid mismatches.
 
-7. **Add Unit Tests**
+6. **Add Unit Tests**
    - Write unit tests for critical functions such as `get_customer_journeys` and `_filter_data_by_date` to ensure correctness.
 
-8. **Avoid Records Duplication**
+7. **Avoid Records Duplication**
    - Add checks to prevent inserting duplicate records into the database tables.
 
-9. **Monitoring and Alerts**
+8. **Monitoring and Alerts**
    - Implement monitoring for pipeline execution and set up alerts for failures or anomalies.

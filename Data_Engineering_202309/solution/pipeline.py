@@ -1,3 +1,4 @@
+import argparse
 from collections import defaultdict
 from datetime import datetime as dt
 import logging
@@ -299,6 +300,16 @@ def main(start_date: Optional[dt] = None, end_date: Optional[dt] = None) -> None
 
 
 if __name__ == "__main__":
-    start_date = dt(2023, 9, 1)
-    end_date = dt(2023, 9, 30)
-    main(start_date=start_date, end_date=end_date)
+    # for test purposes only
+    # start_date = dt(2023, 9, 1)
+    # end_date = dt(2023, 9, 30)
+
+    parser = argparse.ArgumentParser(
+        description="Process customer journey data.")
+    parser.add_argument("--start-date", type=lambda s: dt.strptime(s, "%Y-%m-%d"),
+                        default=None, help="Start date (YYYY-MM-DD). Defaults to None.")
+    parser.add_argument("--end-date", type=lambda s: dt.strptime(s, "%Y-%m-%d"),
+                        default=None, help="End date (YYYY-MM-DD). Defaults to None.")
+    args = parser.parse_args()
+
+    main(start_date=args.start_date, end_date=args.end_date)

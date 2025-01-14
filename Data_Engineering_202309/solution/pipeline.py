@@ -100,13 +100,18 @@ def get_customer_journeys(conversions: pd.DataFrame, sessions: pd.DataFrame) -> 
     # Assign 1 for the closest session and 0 for others
     filtered['conversion'] = filtered['is_closest_session'].astype(int)
 
+    # Format the timestamps to datetime string
+    filtered['event_timestamp'] = filtered['event_timestamp'].dt.strftime('%Y-%m-%d %H:%M:%S')
+    filtered['conv_timestamp'] = filtered['conv_timestamp'].dt.strftime('%Y-%m-%d %H:%M:%S')
+
     # Return transformed data as a list of dictionaries
     return filtered[[
         'conv_id', 'session_id', 'event_timestamp', 'channel_name', 'holder_engagement',
         'closer_engagement', 'conversion', 'impression_interaction'
     ]].rename(columns={
         'conv_id': 'conversion_id',
-        'event_timestamp': 'timestamp'
+        'event_timestamp': 'timestamp',
+        'channel_name': 'channel_label'
     }).to_dict(orient='records')
 
 
@@ -139,11 +144,11 @@ def _send_to_api(payloads: List[List[Dict[str, any]]]) -> List[Dict[str, any]]:
     headers = {"Content-Type": "application/json", "x-api-key": API_KEY}
     results = []
 
+    logging.info("Sending payload to API.")
     for payload in payloads:
         try:
-            logging.info("Sending payload to API.")
             response = requests.post(
-                API_URL, json={"customer_journeys": payload}, headers=headers)
+                API_URL, json={"customer_journeys": payload}, headers=headers, timeout=10)
             response.raise_for_status()
             json_data = response.json()
             if json_data['statusCode'] == 206:
@@ -235,9 +240,8 @@ def generate_channel_reporting() -> pd.DataFrame:
 
     # Add CPO and ROAS columns, handling division by zero
     reporting = _execute_query("SELECT * FROM channel_reporting;")
-    reporting["CPO"] = reporting["cost"] / reporting["ihc"].replace(0, pd.NA)
-    reporting["ROAS"] = reporting["ihc_revenue"] / \
-        reporting["cost"].replace(0, pd.NA)
+    reporting["CPO"] = reporting["cost"] / reporting["ihc"]
+    reporting["ROAS"] = reporting["ihc_revenue"] / reporting["cost"]
     reporting = reporting.fillna(0)
     return reporting
 
@@ -303,7 +307,6 @@ if __name__ == "__main__":
     # for test purposes only
     # start_date = dt(2023, 9, 1)
     # end_date = dt(2023, 9, 30)
-
     parser = argparse.ArgumentParser(
         description="Process customer journey data.")
     parser.add_argument("--start-date", type=lambda s: dt.strptime(s, "%Y-%m-%d"),

@@ -35,7 +35,7 @@ This is of course the perfect setting for an ambitious Data Scientist. ;-) Model
 * How are your model results based on prior sampling vs. posterior sampling?
 * How good is your model performing? How you do measure it? 
 * What are your main insights in terms of channel performance/ effects?
-* (Bonus) Can you derive ROI (return on investment) estimates per channel? What is the best channel in terms of ROI?
+* Can you derive ROI (return on investment) estimates per channel? What is the best channel in terms of ROI?
 
 ## Deliverable
 

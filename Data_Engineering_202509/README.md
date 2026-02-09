@@ -1,6 +1,6 @@
 # Data Engineer Challenge — Dynamic Pricing (State & Data Structures)
 
-**Objective.** Build a simple pricing bot for the **Duopoly** track of the [Dynamic Pricing Competition (DPC)](https://www.dynamic-pricing-competition.com/getting-started/).  
+**Objective.** Build a simple pricing bot for the **Duopoly** track of the [Dynamic Pricing Competition (DPC)](https://www.dynamic-pricing-competition.com).  
 We don’t care about fancy ML — we care about **how you smartly structure and manage data and its information over time**.
 
 ---
